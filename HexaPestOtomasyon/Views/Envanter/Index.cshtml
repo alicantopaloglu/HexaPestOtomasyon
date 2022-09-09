@@ -1,0 +1,408 @@
+﻿@using HexaPestOtomasyon.Models
+@using EntityLayer.Siniflar
+@using BusinessLayer
+@model EnvanterModel
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    PestisitManager pm = new PestisitManager();
+    EkipmanManager em = new EkipmanManager();
+    Pestisit p = new Pestisit();
+    Ekipman e = new Ekipman();
+
+}
+
+<br />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css">
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.bootstrap4.min.css">
+
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap4.min.css">
+
+<div class="container col-md-10">
+
+    <div id="accordion">
+        <div class="card mb-1">
+            <div class="card-header bg-primary">
+                <div style="text-align:center"><a href="#collapseOne" class="card-link text-white" data-toggle="collapse" style="text-align:center"><i class="fas fa-skull"></i><i> Pestisit Listeleri</i></a></div>
+            </div>
+            <div id="collapseOne" class="collapse" data-parent="#accordion">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="container">
+                            <table id="example" class="table table-hover table-success table-striped  dt-responsive nowrap" style="width:100%;color:black;background-color:#ffffff">
+                                <thead>
+                                    <tr>
+                                        <th>Ürün Adı</th>
+                                        <th>Aktif Maddesi</th>
+                                        <th>Antidotu</th>
+                                        <th>Ambalaj Miktarı</th>
+                                        <th>İşlemler</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var x in pm.GetAll())
+                                    {
+                                        if (x.aktif == true)
+                                        {
+                                            <tr>
+                                                <td>@x.ticariAd</td>
+                                                <td><span class="badge bg-danger">@x.aktifMadde</span></td>
+                                                <td><span class="badge bg-success">@x.antidot</span></td>
+                                                <td>@x.miktar @x.birim</td>
+                                                <td><a href="/Envanter/pestisitSil/@x.ID" type="button" class="btn btn-outline-danger"><i class="fas fa-trash-alt" /></a></td>
+
+                                            </tr>
+                                        }
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                    <div class="row" style="text-align:center">
+                        <div class="container">
+                            <button type="button" class="btn btn-outline-success" style="margin-top:20px; width:500px;" data-toggle="modal" data-target="#Modal1"><i class="fas fa-skull-crossbones"></i> Pestisit Ekle</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="card mb-1">
+                <div class="card-header bg-primary">
+                    <div style="text-align:center"><a href="#collapseTwo" class="card-link text-white" data-toggle="collapse"><i class="fas fa-sitemap"></i><i> Ekipman Listeleri</i></a></div>
+                </div>
+                <div id="collapseTwo" class="collapse" data-parent="#accordion">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="container">
+                                <table id="ekipman" class="table table-hover table-success table-striped dt-responsive nowrap" style="width:100%;color:black;background-color:#ffffff">
+                                    <thead>
+                                        <tr>
+                                            <th>Ekipman Türü</th>
+                                            <th>Ekipman Adı</th>
+                                            <th>İşlemler</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var x in em.GetAll())
+                                        {
+                                            if (x.aktif == true)
+                                            {
+                                                <tr>
+                                                    <td>@x.ekipmanTuru</td>
+                                                    <td>@x.ekipmanAdi</td>
+                                                    <td><a href="/Envanter/ekipmanSil/@x.ID" type="button" class="btn btn-outline-danger"><i class="fas fa-trash-alt" /></a></td>
+
+                                                </tr>
+                                            }
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                        <div class="row" style="text-align:center">
+                            <div class="container">
+                                <button type="button" class="btn btn-outline-success" style="margin-top:20px; width:500px;" data-toggle="modal" data-target="#Modal2"><i class="fa fa-medkit"></i> Ekipman Ekle</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header bg-primary">
+                    <h5 class="card-title" style="color:white">Envanter Durumu</h5>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body p-0">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+
+                                <th>Ürün Türü</th>
+                                <th>Stok Durumu</th>
+                                <th style="width: 40px">Toplam Kayıtlı Ürün</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+
+
+                            @{
+                                int oran = ViewBag.pestisit;
+                                int oran2 = ViewBag.ekipman;
+
+                                <tr>
+
+
+                                    <td class="col-md-3">Pestisit</td>
+
+                                    <td class="col-md-5" style="vertical-align:middle;text-align:center">
+
+                                        <div class="progress progress-xs">
+                                            <div class="progress-bar bg-success" aria-valuemin="0" aria-valuemax="100" style="width:@oran%"></div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-danger">@oran</span></td>
+
+                                </tr>
+
+                                <tr>
+                                    <td class="col-md-3">Ekipman</td>
+                                    <td class="col-md-5" style="vertical-align:middle;text-align:center">
+                                        <div class="progress progress-xs">
+                                            <div class="progress-bar bg-success" aria-valuemin="0" aria-valuemax="100" style="width:@oran2%"></div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-danger">@oran2</span></td>
+                                </tr>
+                            }
+
+
+
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@using (Html.BeginForm("pestisitEkle", "Envanter", FormMethod.Post))
+{
+
+    @Html.AntiForgeryToken()
+
+    <div class="modal" id="Modal1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" style="font-style:italic; color:#1a69ca">PESTİSİT EKLE</h5>
+                </div>
+                <div class="modal-body">
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Ürünün Ticari Adı</span>
+                        @Html.TextBoxFor(x => x.Pestisits.ticariAd, new { @Class = "form-control", @required = "required" })
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Aktif Maddesi</span>
+                        @Html.TextBoxFor(x => x.Pestisits.aktifMadde, new { @Class = "form-control", @required = "required" })
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Antidotu</span>
+                        @Html.TextBoxFor(x => x.Pestisits.antidot, new { @Class = "form-control", @required = "required" })
+                    </div>
+
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Ruhsat Tarihi</span>
+                        @Html.TextBoxFor(x => x.Pestisits.ruhsatTarihi, new { @Class = "form-control", @required = "required", type = "date" })
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Ruhsat Süresi</span>
+                        @Html.DropDownListFor(x => x.Pestisits.ruhsatSuresi, new List<SelectListItem>{ new SelectListItem { Text = "6 Ay", Value = "6 Ay" },
+                       new SelectListItem { Text = "1 Yıl", Value = "1 Yıl" },new SelectListItem { Text = "2 Yıl", Value = "2 Yıl" },new SelectListItem { Text = "3 Yıl", Value = "3 Yıl" },
+                       new SelectListItem { Text = "4 Yıl", Value = "4 Yıl" },new SelectListItem { Text = "5 Yıl", Value = "5 Yıl" },new SelectListItem { Text = "6 Yıl", Value = "6 Yıl" },
+                       new SelectListItem { Text = "7 Yıl", Value = "7 Yıl" },new SelectListItem { Text = "8 Yıl", Value = "8 Yıl" },new SelectListItem { Text = "9 Yıl", Value = "9 Yıl" },
+                       new SelectListItem { Text = "10 Yıl", Value = "10 Yıl" } }, new { @class = "form-control", @required = "required" })
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Sayı</span>
+                        @Html.TextBoxFor(x => x.Pestisits.sayi, new { @Class = "form-control", @required = "required" })
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Birim</span>
+                        @Html.DropDownListFor(x => x.Pestisits.birim, new List<SelectListItem>{ new SelectListItem { Text = "ml", Value = "ml" },
+                       new SelectListItem { Text = "litre", Value = "litre" },new SelectListItem { Text = "mg", Value = "mg" },new SelectListItem { Text = "gram", Value = "gram" },
+                       new SelectListItem { Text = "kg", Value = "kg" },new SelectListItem { Text = "adet", Value = "adet" } }, new { @class = "form-control", @required = "required" })
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Miktar</span>
+                        @Html.TextBoxFor(x => x.Pestisits.miktar, new { @Class = "form-control", @required = "required" })
+                        @Html.HiddenFor(x => x.Pestisits.aktif, new { Value = true })
+                    </div>
+
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+
+                    @*<button id="kaydet" type="submit" class="btn btn-primary">Kaydet</button>*@
+                    <input type="submit" class="btn btn-primary" name="save" value="Kaydet" />
+                    @*<a href="/Envanter/pestisitEkle" type="button" class="btn btn-primary">Kaydet</a>*@
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+@using (Html.BeginForm("ekipmanEkle", "Envanter", FormMethod.Post))
+{
+
+    @Html.AntiForgeryToken()
+
+    <div class="modal" id="Modal2">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" style="font-style:italic; color:#1a69ca">EKİPMAN EKLE</h5>
+                </div>
+                <div class="modal-body">
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Ekipman Adı</span>
+                        @Html.TextBoxFor(x => x.Ekipmans.ekipmanAdi, new { @Class = "form-control", @required = "required" })
+                        @Html.HiddenFor(x => x.Ekipmans.aktif, new { Value = true })
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Ekipman Türü</span>
+                        @Html.DropDownListFor(x => x.Ekipmans.ekipmanTuru, new List<SelectListItem>{ new SelectListItem { Text = "Yürüyen Haşere", Value = "Yürüyen Haşere" },
+                       new SelectListItem { Text = "Uçan Haşere", Value = "Uçan Haşere" },new SelectListItem { Text = "Kemirgen", Value = "Kemirgen" } }, new { @class = "form-control", @required = "required" })
+                    </div>
+
+
+
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+
+                    @*<button id="kaydet" type="submit" class="btn btn-primary">Kaydet</button>*@
+                    <input type="submit" class="btn btn-primary" name="save" value="Kaydet" />
+                    @*<a href="/Envanter/pestisitEkle" type="button" class="btn btn-primary">Kaydet</a>*@
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+<script src="~/js/bootstrap.min.js"></script>
+<script src="~/js/jquery-3.3.1.min.js"></script>
+
+
+
+
+
+
+
+
+<script>
+
+    $(document).ready(function () {
+        var table = $('#example').DataTable({
+            lengthChange: true,
+            pageLength: 5,
+            
+            "language": {
+                
+                "info": "Gösterilen Satırlar: _START_ ve _END_ Arasıdır. Toplam Veri : _TOTAL_ Satır",
+                "infoEmpty": "Kayıt Bulunamadı",
+                "search": "ARA:",
+                "lengthMenu": "_MENU_ Satır",
+                "zeroRecords": "HİÇ KAYIT YOK",
+                "paginate": {
+                    "previous": "Önceki",
+                    "next": "Sonraki"
+                }
+                
+
+            },
+            "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Tümü"]],
+            
+
+        });
+       
+        table.buttons().container()
+            .appendTo('#example_wrapper .col-md-4:eq(0)');
+    });
+
+</script>
+
+<script>
+
+    $(document).ready(function () {
+
+        var table = $('#ekipman').DataTable({
+
+            lengthChange: true,
+            pageLength: 5,
+            
+            "language": {
+
+                "info": "Gösterilen Satırlar: _START_ ve _END_ Arasıdır. Toplam Veri : _TOTAL_ Satır",
+                "infoEmpty": "Kayıt Bulunamadı",
+                "search": "ARA:",
+                "lengthMenu": "_MENU_ Satır",
+                "zeroRecords": "HİÇ KAYIT YOK",
+                "paginate": {
+                    "previous": "Önceki",
+                    "next": "Sonraki"
+                }
+
+
+            },
+            "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Tümü"]],
+
+
+
+        });
+
+        table.buttons().container()
+
+            .appendTo('#example_wrapper .col-md-4:eq(0)');
+       
+
+        
+            
+
+    });
+
+    $('#ekipman td').hover(function () {
+        $(this).css('color', 'green');
+    },
+        function () {
+            $(this).css('color', 'black');
+        });
+    $('#example td').hover(function () {
+        $(this).css('color', 'green');
+    },
+        function () {
+            $(this).css('color', 'black');
+        });
+
+</script>
+
+
+
+

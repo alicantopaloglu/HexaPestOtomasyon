@@ -1,0 +1,263 @@
+﻿@using HexaPestOtomasyon.Models
+@using BusinessLayer
+@using EntityLayer.Siniflar
+@model MusteriModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    MusteriManager mm = new MusteriManager();
+    SehirManager sm = new SehirManager();
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap4.min.css">
+<br />
+
+<div class="container col-md-10">
+    <div class="row">
+        <div class="container">
+            <div class="card">
+                <div class="card-header bg-success">
+                    <h5 style="text-align:center;color:white">MÜŞTERİ LİSTESİ</h5>
+                </div>
+                <div style="margin-top:20px;margin-left:10px;margin-right:10px">
+
+
+                    <table id="musteri" class="table table-hover  table-striped  dt-responsive nowrap" style="width:100%;color:black;background-color:#ffffff">
+
+                        <thead>
+                            <tr>
+                                <th>Müşteri Adı</th>
+                                <th>Proje Sayısı</th>
+                                <th>Hesap Durumu</th>
+                                <th>Üyelik Tipi</th>
+                                <th>İşlemler</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var x in mm.GetAll())
+                            {
+
+                                <tr>
+                                    <td>@x.adi</td>
+                                    <td>@x.projeSayisi</td>
+                                    <td class="btn-success">
+                                        @{string s = "";}
+                                        @if (x.aktif == true)
+                                        { s = "AKTİF"; }
+                                        else
+                                        {
+                                            s = "PASİF";
+                                        }
+                                        @s
+                                    </td>
+                                    <td>@x.uyelikTip</td>
+                                    <td><a href="/Envanter/pestisitSil/@x.ID" type="button" class="btn btn-outline-success"><i class="fas fa-trash-alt" />Görüntüle Ve Düzenle</a> <a href="/Envanter/pestisitSil/@x.ID" type="button" class="btn btn-outline-danger"><i class="fas fa-trash-alt" />SİL</a></td>
+
+                                </tr>
+
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="row" style="text-align:center">
+        <div class="container">
+            <button type="button" class="btn btn-outline-success" style="margin-top:20px; width:500px;" data-toggle="modal" data-target="#Modal1"><i class="fas fa-skull-crossbones"></i> Müşteri Ekle</button>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("musteriEkle", "Musteri", FormMethod.Post))
+{
+    <div class="container">
+        <div class="modal" id="Modal1">
+            <div class="modal-dialog modal-dialog-scrollable modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Yeni Müşteri</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="btn-outline-success">
+
+                            <h6>Yetkili ve Kullanıcı Bilgileri</h6>
+                            <hr />
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">İSİM SOYİSİM</span>
+                            @Html.TextBoxFor(x => x.Musteris.adi, new { placeholder = "Firma Yetkilisi ya da Şahıs Bilgisi", @Class = "form-control" })
+                        </div>
+
+
+                        <div>
+                            <small style="color:black">  <i class="fa fa-info"></i>  Raporların Gönderileceği ve Giriş Yaparken Kullanılacak E-Posta</small>
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1"><i class="fa fa-user"></i></span>
+
+                            @Html.TextBoxFor(x => x.Musteris.mail, new { placeholder = "Örnek Hexa@Hexapest.com", @Class = "form-control" })
+                        </div>
+                        <div>
+                            <small style="color:red">  <i class="fa fa-info"></i>  Geçici Şifre Kullanıcılardan Şifrelerini Değiştirmelerini İsteyiniz</small>
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1"><i class="fas fa-user-lock"></i></span>
+                            @Html.TextBoxFor(x => x.Musteris.sifre, new { placeholder = "ŞİFRE", @Class = "form-control",id="sifre" })
+                        </div>
+                        <div>
+                            <small style="color:black">  <i class="fa fa-info"></i>  Yetkili Kişinin İrtibat Numaraları</small>
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1"><i class="fa fa-phone"></i></span>
+                            @Html.TextBoxFor(x => x.Musteris.sabitTel, new { placeholder = "Sabit Telefon", @Class = "form-control",id="sabitTel" })&emsp;
+
+                            <span class="input-group-text" id="basic-addon1"><i class="	fa fa-mobile"></i></span>
+                            @Html.TextBoxFor(x => x.Musteris.mobilTel, new { placeholder = "Mobil Telefon", @Class = "form-control",id="mobilTel" })
+
+                        </div>
+
+                        <div class="btn-outline-success">
+                            <hr />
+                            <h6>Hizmet Bölgesi Bilgileri</h6>
+                            <hr />
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1"><i class="fas fa-warehouse"></i></span>
+                            @Html.TextBoxFor(x => x.Musteris.firmaAdi, new { placeholder = "Firma / Şahıs Adı", @Class = "form-control" })
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Açık Adres</span>
+
+                            @Html.TextAreaFor(x => x.Musteris.adres, new { @Class = "form-control" })
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1">Şehir</span>
+                            @Html.DropDownListFor(x => x.Musteris.sehir, Model.sehirler, "Şehir Seçiniz", new { @Class = "form-control", id = "DrpSehir" })&emsp;
+
+                            <span class="input-group-text" id="basic-addon1">İlçe</span>
+                            @Html.DropDownListFor(x => x.Musteris.ilce, Model.ilceler, "İlçe Seçiniz", new { @Class = "form-control", id = "DrpIlce" })
+                            @Html.HiddenFor(x => x.Musteris.projeSayisi, new { Value = 0 })
+
+
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon1"><i class="fa fa-phone"></i></span>
+                            @Html.TextBoxFor(x => x.Musteris.sabitTel2, new { placeholder = "Sabit Telefon", @Class = "form-control", id = "sabitTel2" })&emsp;
+
+                            <span class="input-group-text" id="basic-addon1"><i class="	fa fa-mobile"></i></span>
+                            @Html.TextBoxFor(x => x.Musteris.mobilTel2, new { placeholder = "Mobil Telefon", @Class = "form-control",id="mobilTel2" })
+                            @Html.HiddenFor(x => x.Musteris.aktif, new { Value = true })
+
+                        </div>
+
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+
+                        @*<button id="kaydet" type="submit" class="btn btn-primary">Kaydet</button>*@
+                        <input type="submit" class="btn btn-primary" name="save" value="Kaydet" />
+
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script src="~/js/bootstrap.min.js"></script>
+<script src="~/js/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/jquery.maskedinput.js"></script>
+<script src="~/Scripts/jquery.maskedinput.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+
+        var table = $('#musteri').DataTable({
+
+            lengthChange: true,
+            pageLength: 5,
+           
+            "language": {
+
+                "info": "Gösterilen Satırlar: _START_ ve _END_ Arasıdır. Toplam Veri : _TOTAL_ Satır",
+                "infoEmpty": "Kayıt Bulunamadı",
+                "search": "ARA:",
+                "lengthMenu": "_MENU_ Satır",
+                "zeroRecords": "HİÇ KAYIT YOK",
+                "paginate": {
+                    "previous": "Önceki",
+                    "next":"Sonraki"
+                }
+
+
+            },
+            "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Tümü"]],
+
+
+
+
+        });
+
+        table.buttons().container()
+
+            .appendTo('#example_wrapper .col-md-4:eq(0)');
+
+    });
+
+    $('#musteri td').hover(function () {
+        $(this).css('color', 'green');
+    },
+        function () {
+            $(this).css('color', 'black');
+        });
+
+
+
+
+</script>
+
+
+
+<script>
+    $(function () {
+        $('#DrpSehir').change(function () {
+            var id = $('#DrpSehir').val();
+            $.ajax({
+                url: '/Musteri/ilceGetir',
+                data: { p: id },
+                type: "POST",
+                dataType: "Json",
+                success: function (data) {
+                    console.log(data);
+                    $('#DrpIlce').empty();
+                    for (var i = 0; i < data.length; i++) {
+                        $('#DrpIlce').append("<option value='" + data[i].Value + "'>" + data[i].Text + "</Option>");
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    $('#sabitTel').mask('(999) 999-99-99');
+    $('#sabitTel2').mask('(999) 999-99-99');
+    $('#mobilTel').mask('(999) 999-99-99');
+    $('#mobilTel2').mask('(999) 999-99-99');
+
+</script>
+
+
